@@ -35,7 +35,7 @@ public class MainActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+        return false;
     }
 
     @Override
@@ -64,6 +64,7 @@ public class MainActivity extends ActionBarActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
+
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
             String[] forecastArray = {
@@ -84,10 +85,12 @@ public class MainActivity extends ActionBarActivity {
                     getActivity(),
 
                     //resource
-                    R.layout.list_item_forecast,
+                    //R.layout.list_item_forecast,
+                    android.R.layout.simple_list_item_1,
 
                     //textview resource ID
-                    R.id.list_item_forecast_textview,
+//                    R.id.list_item_forecast_textview,
+                    android.R.id.text1,
 
                     //list
                     weekForecast
