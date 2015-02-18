@@ -142,10 +142,10 @@ public class MainActivity extends ActionBarActivity {
                     "Sunday"
             };
 
-            ArrayList<String> weekForecast = new ArrayList<String>(
+            ArrayList<String> weekForecast = new ArrayList<>(
                     Arrays.asList(forecastArray));
 
-            ArrayAdapter<String> mForecastAdapter = new ArrayAdapter<String>(
+            ArrayAdapter<String> mForecastAdapter = new ArrayAdapter<>(
                     //context
                     getActivity(),
 
