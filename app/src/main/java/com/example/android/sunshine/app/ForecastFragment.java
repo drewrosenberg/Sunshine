@@ -1,8 +1,11 @@
 package com.example.android.sunshine.app;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.text.format.Time;
 import android.util.Log;
@@ -12,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -56,19 +60,34 @@ public class ForecastFragment extends Fragment{
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        new FetchWeatherTask().execute("99027");
+        fetchWeatherData();
         return super.onOptionsItemSelected(item);
+    }
+
+
+    public void fetchWeatherData(){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+        String key = getString(R.string.pref_location_key);
+        String defaultValue = getString(R.string.pref_location_default);
+        String value = preferences.getString(key, defaultValue);
+
+        new FetchWeatherTask().execute(value);
+    }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        fetchWeatherData();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-
-        new FetchWeatherTask().execute("99027");
-
-
+        final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        
         String[] strings = {};
 
         ArrayList<String> emptyList = new ArrayList<>(
@@ -93,6 +112,18 @@ public class ForecastFragment extends Fragment{
 
         ListView forecastListView = (ListView) rootView.findViewById(R.id.listview_forecast);
         forecastListView.setAdapter(mForecastAdapter);
+
+        forecastListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                Toast.makeText(getActivity(), ForecastFragment.mForecastAdapter.getItem(position), Toast.LENGTH_SHORT).show();
+                // Executed in an Activity, so 'this' is the Context
+                // The fileUrl is a string URL, such as "http://www.example.com/image.png"
+                String forecast = ForecastFragment.mForecastAdapter.getItem(position);
+                Intent detailIntent = new Intent(getActivity(), detailActivity.class).putExtra(Intent.EXTRA_TEXT, forecast);
+                startActivity(detailIntent);
+            }
+        });
 
         return rootView;
     }
@@ -318,22 +349,4 @@ public class ForecastFragment extends Fragment{
 
 
     }
-//    public class WeatherDataParser {
-//
-//        /**
-//         * Given a string of the form returned by the api call:
-//         * http://api.openweathermap.org/data/2.5/forecast/daily?q=94043&mode=json&units=metric&cnt=7
-//         * retrieve the maximum temperature for the day indicated by dayIndex
-//         * (Note: 0-indexed, so 0 would refer to the first day).
-//         */
-//        public static double getMaxTemperatureForDay(String weatherJsonStr, int dayIndex)
-//                throws JSONException {
-//            JSONObject thisObject = new JSONObject(weatherJsonStr);
-//
-//            return thisObject.getJSONArray("list").getJSONObject(dayIndex).getJSONObject("temp").getDouble("max");
-//        }
-//
-//    }
-
-
 }
