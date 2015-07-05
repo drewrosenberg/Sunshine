@@ -3,7 +3,6 @@ package com.example.android.sunshine.app;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -11,8 +10,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.v7.widget.ShareActionProvider;
+import android.widget.ShareActionProvider;
 import android.widget.TextView;
+
+//import android.support.v7.widget.ShareActionProvider; <-- for Android versions prior to 4.0
 
 
 /**
@@ -54,7 +55,11 @@ public class detailActivityFragment extends Fragment {
         MenuItem shareMenuItem = menu.findItem(R.id.menu_item_share);
 
         //get the provider and hold on to it to set/change the share intent
-        ShareActionProvider mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareMenuItem);
+        ShareActionProvider mShareActionProvider = (ShareActionProvider) shareMenuItem.getActionProvider();
+
+        //for versions of Android prior to 4.0:
+        //MenuItemCompat provides new menu item features to older versions of Android
+        //ShareActionProvider mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareMenuItem);
 
         //attach an intent to the shareActionProvider
         if (mShareActionProvider != null){
