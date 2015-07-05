@@ -42,7 +42,7 @@ public class ForecastFragment extends Fragment{
 
     }
 
-    public static ArrayAdapter<String> mForecastAdapter;
+    private static ArrayAdapter<String> mForecastAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -60,19 +60,41 @@ public class ForecastFragment extends Fragment{
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        fetchWeatherData();
+
+        int id = item.getItemId();
+
+        if (id==R.id.action_refresh){
+            fetchWeatherData();
+        }else if (id==R.id.action_location){
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+
+            intent.setData(Uri.parse("geo:0,0?").buildUpon()
+                    .appendQueryParameter("q", getZipCode())
+                    .build()
+            );
+
+            if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                startActivity(intent);
+            }
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
 
-    public void fetchWeatherData(){
+    private void fetchWeatherData(){
+        new FetchWeatherTask().execute(getZipCode());
+    }
+
+    private String getZipCode(){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         String key = getString(R.string.pref_location_key);
         String defaultValue = getString(R.string.pref_location_default);
         String value = preferences.getString(key, defaultValue);
 
-        new FetchWeatherTask().execute(value);
+        return value;
+
     }
 
 
@@ -87,7 +109,7 @@ public class ForecastFragment extends Fragment{
                              Bundle savedInstanceState) {
 
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        
+
         String[] strings = {};
 
         ArrayList<String> emptyList = new ArrayList<>(
@@ -261,12 +283,23 @@ public class ForecastFragment extends Fragment{
          * Prepare the weather high/lows for presentation.
          */
         private String formatHighLows(double high, double low) {
+
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String unitType = sharedPref.getString(
+                    getString(R.string.pref_temp_units_key),
+                    getString(R.string.temp_units_Metric)
+            );
+
+            if (unitType.equals(getString(R.string.temp_units_Imperial))){
+                high = (high * 1.8) + 32;
+                low = (low * 1.8) + 32;
+            }
+
             // For presentation, assume the user doesn't care about tenths of a degree.
             long roundedHigh = Math.round(high);
             long roundedLow = Math.round(low);
 
-            String highLowStr = roundedHigh + "/" + roundedLow;
-            return highLowStr;
+            return (roundedHigh + "/" + roundedLow);
         }
 
         /**
